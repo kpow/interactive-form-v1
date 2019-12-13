@@ -1,4 +1,4 @@
-$( document ).ready(function() {
+$( document ).ready( () => {
     console.log( "ready!" );
 
     const $nameElement = $('#name'),
@@ -14,10 +14,7 @@ $( document ).ready(function() {
     // initial setup      
     $nameElement.focus();
     $otherElement.hide();
-
-    $colorOptions.each(function() {
-        $(this).prop('hidden', 'hidden');
-    });
+    $colorOptions.each(function() {$(this).prop('hidden', 'hidden');});
     $colorElement.prepend('  <option value="" disabled selected hidden>Please select a T-shirt theme</option>')
 
     // event handlers
