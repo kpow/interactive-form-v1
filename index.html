@@ -4,7 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Register for Full Stack Conf</title>
-	<link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" 
+  href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" 
+  integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" 
+  crossorigin="anonymous" />
+  <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+
 </head>
 <body>
 	<div class="container">
@@ -33,7 +42,11 @@
           <option value="designer">Designer</option>          
           <option value="student">Student</option>
           <option value="other">Other</option>  
-        </select>           
+        </select>  
+        
+        <label for="other">Other:</label>
+        <input type="text" id="other-title" name="other-title" placeholder="Your Job Role">
+
       </fieldset>
       
       <fieldset class="shirt">
@@ -172,5 +185,6 @@
     </form>
 
   </div>
+  <script src="js/script.js"></script>
 </body>
 </html>
