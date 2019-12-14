@@ -10,14 +10,32 @@ $( document ).ready( () => {
           $colorOptions = $('#color > option'),
           $otherElement = $('#other-title'),
           $otherLabel = $('label[for="other"]')
-          $activityElement = $('.activities'),
-          $activityCheckboxes = $('.activities input'),
+          $activityElement = $('#activities'),
+          $activityCheckboxes = $('#activities input'),
           $paypalElement = $('.paypal'),
           $bitcoinElement = $('.bitcoin'),
-          $paymentElement = $('#payment')
+          $paymentElement = $('#payment'),
+          $ccElement = $('#cc_num'),
+          $cvvElement = $('#cvv'),
+          $zipcodeElement = $('#zip')
+
+    // error messages for validation
+    const errorMessages = {
+        name:"enter your name",
+        mail:"enter your email address",
+        activities:"choose an activity",
+        cc_num:"enter a valid credit card",
+        zip:"enter a valid zip code",
+        cvv:"enter a valid cvv number"
+    }
+
+    // colors for matching design theme under t-shirt
+    const punColors = ['cornflowerblue','darkslategrey','gold'],
+          heartColors = ['tomato','steelblue','dimgrey']
     
-    let totalPrice = 0      
-        
+    // variable for tracking price      
+    let totalPrice = 0  
+
     // initial setup      
     $nameElement.focus()
     $otherElement.hide()
@@ -28,14 +46,6 @@ $( document ).ready( () => {
     $colorOptions.each(function() {$(this).prop('hidden', 'hidden');})
     $colorElement.prepend('<option value="" disabled selected hidden>Please select a T-shirt theme</option>')
     $activityElement.append('<div class="total-price"></div>')
-
-    $nameElement.on('keyup', ()=>{
-        isNameValid() ? $nameElement.removeClass('is-error') : $nameElement.addClass('is-error')
-    })
-
-    $emailElement.on('keyup', ()=>{
-        isEmailValid() ? $emailElement.removeClass('is-error') : $emailElement.addClass('is-error')
-    })
 
     // validation functions
     const isNameValid = () => /^(?!\s*$).+/.test($nameElement.val())
@@ -54,15 +64,41 @@ $( document ).ready( () => {
     }
 
     const isCreditCardValid = () =>{
-        
+        const regEx = /^\d{4}([ \-]?)((\d{6}\1?\d{5})|(\d{4}\1?\d{4}\1?\d{4}))$/gm
+        return regEx.test($ccElement.val())
     }
 
     const isZipCodeValid = () =>{
-        
+        const regEx = /^\d{5}(?:[-\s]\d{4})?$/
+        return regEx.test($zipcodeElement.val())
     }
 
     const isCVVValid = () =>{
-        
+        const regEx = /^\d{3}?/
+        return regEx.test($cvvElement.val())
+    }
+
+    // this function presednt error messaging
+    const toggleError = ($element, what) =>{
+        // grab the id to create class and access error messages
+        const elementID = $element.attr('id')
+        // use the id from the element to match a key in error message object
+        const errorMessage = errorMessages[elementID]
+        // conditional to toggle between add and remove error state
+        if(what === "remove"){
+            // remove error class to element and remove message
+            $element.removeClass('is-error')
+            $('.'+elementID+'-error').remove()
+
+        }else if(what === "add"){
+            // check to see if error is up already
+            if(!$('.'+elementID+'-error').length){
+                // if not add element style and presesnt error message
+                $element.addClass('is-error')
+                $('<div class="error-message '+$element.attr('id')+'-error">'+errorMessage+'</div>')
+                 .insertAfter($element)
+            }
+        }
     }
 
     // event handlers
@@ -70,25 +106,22 @@ $( document ).ready( () => {
     // I did this event handler before I read the pdf, 
     // but it seems to work correctly and the code doesnt look to wonky
     $designElement.on('change', function(e){
-
-        const punColors = ['cornflowerblue','darkslategrey','gold'],
-              heartColors = ['tomato','steelblue','dimgrey'],
-              targetValue =  this.value
+        const targetValue =  this.value
         // loop through and set selections for each option
         $colorOptions.each(function() {
             const currentValue = $(this).val()
-            $(this).prop('hidden', 'hidden');
+            $(this).prop('hidden', 'hidden')
 
             if(targetValue === 'js puns'){
                 for(let i=0; i<punColors.length; i++){
                    if(punColors[i]===currentValue){
-                        $(this).prop('hidden', false); 
+                        $(this).prop('hidden', false)
                     }
                 }  
             }else if(targetValue === 'heart js'){
                 for(let i=0; i<heartColors.length; i++){
                     if(heartColors[i]===currentValue){
-                         $(this).prop('hidden', false); 
+                         $(this).prop('hidden', false)
                      }
                  } 
             }
@@ -100,7 +133,8 @@ $( document ).ready( () => {
     $activityElement.on('change', (e)=>{
         // reset price
         totalPrice = 0;
-        console.log(isActivitiesValid());
+        // run validation and apply error class if false
+        isActivitiesValid() ? toggleError($activityElement, 'remove') : toggleError($activityElement, 'add') 
 
         //loop through all activities
         $activityCheckboxes.each((i)=>{
@@ -108,10 +142,10 @@ $( document ).ready( () => {
             // if we match date/time we disable and but we dont disable the event target
             if($currentElement.attr('data-day-and-time') === $(e.target).attr('data-day-and-time')){
                 if($(e.target).is(":checked")){
-                    $currentElement.prop("disabled", true);
-                    $(e.target).prop("disabled", false);
+                    $currentElement.prop("disabled", true)
+                    $(e.target).prop("disabled", false)
                 }else{
-                    $currentElement.prop("disabled", false);
+                    $currentElement.prop("disabled", false)
                 }
             }
         })
@@ -125,24 +159,51 @@ $( document ).ready( () => {
         $('.total-price').html('Total: $'+totalPrice)
 
     })
+
     // toggle payment types
     $paymentElement.on('change', (e)=>{
-        const type = e.target.value
         // turn them all off
         $('.credit-card, .bitcoin, .paypal').hide()
         // turn the right one on
-        $('.'+type).show();
+        $('.'+e.target.value).show()
     })
-    // toggle other element
+
+    // toggle other for job role element
     $titleElement.on('change', (e)=>{
-        const role = e.target.value;
-        if(role==="other"){
+
+        if(e.target.value === "other"){
             $otherElement.show()
             $otherLabel.show()
         }else{
             $otherElement.hide()
             $otherLabel.hide()
         }
+
+    })
+
+    $nameElement.on('keyup', ()=>{
+         // run validation and apply error class if false
+        isNameValid() ? toggleError($nameElement, 'remove') : toggleError($nameElement, 'add')
+    })
+
+    $ccElement.on('keyup', ()=>{
+        // run validation and apply error class if false
+        isCreditCardValid() ? toggleError($ccElement, 'remove') : toggleError($ccElement, 'add')
+    })
+
+    $emailElement.on('keyup', ()=>{
+         // run validation and apply error class if false
+        isEmailValid() ? toggleError($emailElement, 'remove') : toggleError($emailElement, 'add')
+    })
+
+    $zipcodeElement.on('keyup', ()=>{
+        // run validation and apply error class if false
+        isZipCodeValid() ? toggleError($zipcodeElement, 'remove') : toggleError($zipcodeElement, 'add')
+    })
+
+   $cvvElement.on('keyup', ()=>{
+        // run validation and apply error class if false
+        isCVVValid() ? toggleError($cvvElement, 'remove') : toggleError($cvvElement, 'add')
     })
 
 });
