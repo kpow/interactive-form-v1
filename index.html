@@ -43,9 +43,9 @@
           <option value="student">Student</option>
           <option value="other">Other</option>  
         </select>  
-        
+         
         <label for="other">Other:</label>
-        <input type="text" id="other-title" name="other-title" placeholder="Your Job Role">
+        <input type="text" id="other-title" name=“job_role_other” placeholder="Your Job Role">
 
       </fieldset>
       
@@ -66,7 +66,7 @@
           <div>
             <label for="design">Design:</label>
             <select id="design" name="user-design">
-              <option>Select Theme</option>
+              <option hidden>Select Theme</option>
               <option value="js puns">Theme - JS Puns</option>
               <option value="heart js">Theme - I &#9829; JS</option>
             </select>
@@ -122,8 +122,8 @@
 
         <label for="payment">I'm going to pay with:</label>
         <select id="payment" name="user-payment">
-          <option value="select method">Select Payment Method</option>
-          <option value="credit card">Credit Card</option>
+          <option value="select method" hidden>Select Payment Method</option>
+          <option value="credit-card">Credit Card</option>
           <option value="paypal">PayPal</option>
           <option value="bitcoin">Bitcoin</option>
         </select>

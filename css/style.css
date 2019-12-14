@@ -170,6 +170,10 @@ option {
   Helper Classes
 ==================================== */
 
+.is-error{
+	border: 3px solid red !important;
+}
+
 .is-hidden {
 	display: none;
 }
