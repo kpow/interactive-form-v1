@@ -128,7 +128,7 @@ $( document ).ready( () => {
         // set primary if they return true
        if( isNameValid() &&
            isEmailValid() &&
-            isActivitiesValid() ){
+           isActivitiesValid() ){
             primary = true
         }
 
@@ -143,8 +143,11 @@ $( document ).ready( () => {
                isCVVValid()) payment = true
         }
         // if they dont validate prevent the browser from submitting
-        if(!ccActive && !primary) e.preventDefault()
-        if(ccActive && !primary || !payment) e.preventDefault()
+        if(!ccActive){
+            if(!primary) e.preventDefault()
+        } else if(ccActive){
+            if(!primary || !payment) e.preventDefault()
+        } 
     }
 
     // this function present error messaging
