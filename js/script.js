@@ -66,6 +66,7 @@ $( document ).ready( () => {
     } 
 
     const isEmailValid = () =>{
+        // regex from http://emailregex.com/
         const regEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         const valid = regEx.test($emailElement.val())
          //conditional to set error state
@@ -84,7 +85,7 @@ $( document ).ready( () => {
     }
 
     const isCreditCardValid = () =>{
-        // regex from http://emailregex.com/
+        /// found this regex on stackoverflow, it works with all test cases
         const regEx = /^\d{4}([ \-]?)((\d{6}\1?\d{5})|(\d{4}\1?\d{4}\1?\d{4}))$/gm
         const valid = regEx.test($ccElement.val())
          //conditional to set error state
