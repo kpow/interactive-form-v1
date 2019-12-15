@@ -37,7 +37,10 @@ $( document ).ready( () => {
     
     // variable for tracking price      
     let totalPrice = 0  
+    // tracking cc state
     let ccActive = true;
+    // tracking currently selected tshirt design theme
+    let currentTheme = ''
 
     // initial setup      
     $nameElement.focus()
@@ -48,13 +51,16 @@ $( document ).ready( () => {
     $otherLabel.hide()
     $colorElement.hide()
     $colorLabel.hide()
-    $colorOptions.each(function() {$(this).prop('hidden', 'hidden');})
+    $($paymentElement.children()[1]).prop('selected', 'selected')
+    $colorOptions.each(function() { $(this).prop('hidden', 'hidden') })
     $colorElement.prepend('<option value="" disabled selected hidden>Please select a T-shirt theme</option>')
     $activityElement.append('<div class="total-price"></div>')
 
     // validation functions
     const isNameValid = () =>{
+        // quick regex test for any 1 character
         const valid = /^(?!\s*$).+/.test($nameElement.val())
+        //conditional to set error state
         valid  ? toggleError($nameElement, 'remove') : toggleError($nameElement, 'add')
         return valid
     } 
@@ -62,6 +68,7 @@ $( document ).ready( () => {
     const isEmailValid = () =>{
         const regEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         const valid = regEx.test($emailElement.val())
+         //conditional to set error state
         valid ? toggleError($emailElement, 'remove') : toggleError($emailElement, 'add')
         return valid
     }
@@ -71,18 +78,22 @@ $( document ).ready( () => {
         $activityCheckboxes.each((i)=>{
           if($($activityCheckboxes[i]).is(':checked')) valid = true
         })
+         //conditional to set error state
         valid ? toggleError($activityElement, 'remove') : toggleError($activityElement, 'add') 
         return valid
     }
 
     const isCreditCardValid = () =>{
+        // regex from http://emailregex.com/
         const regEx = /^\d{4}([ \-]?)((\d{6}\1?\d{5})|(\d{4}\1?\d{4}\1?\d{4}))$/gm
         const valid = regEx.test($ccElement.val())
+         //conditional to set error state
         valid ? toggleError($ccElement, 'remove') : toggleError($ccElement, 'add')
         return valid
     }
 
     const isZipCodeValid = () =>{
+        // checks for 5 and 9 digits zips
         const valid = /^\d{5}(?:[-\s]\d{4})?$/.test($zipcodeElement.val())
         // checking the state of the input and changing error message based on that
         if($zipcodeElement.val().length >= 1 && $zipcodeElement.val() < 5){
@@ -90,30 +101,49 @@ $( document ).ready( () => {
         }else if($zipcodeElement.val().length < 1){
             errorMessages.zip = "enter a valid zip code"
         }
-
+         //conditional to set error state
         valid ? toggleError($zipcodeElement, 'remove') : toggleError($zipcodeElement, 'add')
         return valid
     }
 
     const isCVVValid = () =>{  
+        // test for 3 digits
         const valid = /^\d{3}?/.test($cvvElement.val())
+         //conditional to set error state
         valid ? toggleError($cvvElement, 'remove') : toggleError($cvvElement, 'add')
         return valid
     }
 
     const validateForm = (e) => {
-        e.preventDefault()
-        // check universal elements
+        // couple of vars to hold validation state
+        let primary = false
+        let payment = false
+
+        // check the global elements
         isNameValid()
         isEmailValid()
         isActivitiesValid()
+
+        // set primary if they return true
+       if( isNameValid() &&
+           isEmailValid() &&
+            isActivitiesValid() ){
+            primary = true
+        }
+
         // check these if CC is active
         if(ccActive){
             isCreditCardValid()
             isZipCodeValid()
-            isCVVValid()  
+            isCVVValid()
+            // if the validate true set payment state
+            if(isCreditCardValid() && 
+               isZipCodeValid() && 
+               isCVVValid()) payment = true
         }
-        
+        // if they dont validate prevent the browser from submitting
+        if(!ccActive && !primary) e.preventDefault()
+        if(ccActive && !primary || !payment) e.preventDefault()
     }
 
     // this function present error messaging
@@ -140,11 +170,12 @@ $( document ).ready( () => {
     }
 
     // event handlers
-
+    
     // I did this event handler before I read the pdf, 
     // but it seems to work correctly and the code doesnt look to wonky
     $designElement.on('change', function(e){
         const targetValue =  this.value
+        
         // show the color select element
         $colorElement.show()
         $colorLabel.show()
@@ -168,6 +199,13 @@ $( document ).ready( () => {
                  } 
             }
         });
+        // toggle the current theme variable which allows us to 
+        // reset color option if we change themes
+        if(targetValue != currentTheme){
+            currentTheme = targetValue
+            const whichOne = (currentTheme === 'js puns') ? punColors : heartColors
+            $('#color > option[value="'+whichOne[0]+'"]').prop('selected','selected')
+        }
     });
 
     // I did this event handler before I read the pdf, 
@@ -214,7 +252,6 @@ $( document ).ready( () => {
 
     // toggle other for job role element
     $titleElement.on('change', (e)=>{
-
         if(e.target.value === "other"){
             $otherElement.show()
             $otherLabel.show()
@@ -225,10 +262,10 @@ $( document ).ready( () => {
     })
 
     $nameElement.on('keyup', ()=> isNameValid() )
-    $ccElement.on('keyup', ()=>isCreditCardValid())
-    $emailElement.on('keyup', ()=>isEmailValid())
-    $zipcodeElement.on('keyup', ()=>isZipCodeValid())
-    $cvvElement.on('keyup', ()=>isCVVValid())
+    $ccElement.on('keyup', ()=> isCreditCardValid())
+    $emailElement.on('keyup', ()=> isEmailValid())
+    $zipcodeElement.on('keyup', ()=> isZipCodeValid())
+    $cvvElement.on('keyup', ()=> isCVVValid())
     $submitButton.on('click', (e) => validateForm(e))
 
 });
