@@ -86,7 +86,7 @@ $( document ).ready( () => {
 
     const isCreditCardValid = () =>{
         /// found this regex on stackoverflow, it works with all test cases
-        const regEx = /^\d{4}([ \-]?)((\d{6}\1?\d{5})|(\d{4}\1?\d{4}\1?\d{4}))$/gm
+        const regEx = /^\d{13,16}$/
         const valid = regEx.test($ccElement.val())
          //conditional to set error state
         valid ? toggleError($ccElement, 'remove') : toggleError($ccElement, 'add')
